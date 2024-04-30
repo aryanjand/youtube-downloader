@@ -4,7 +4,7 @@ import os
 import re
 
 # Define the path where you want to save videos.
-save_path = './'
+save_path = './output'
 
 # Open the file with YouTube URLs.
 with open('links.txt', 'r') as file:
@@ -34,7 +34,9 @@ with open('links.txt', 'r') as file:
 
             # Convert the downloaded video to AV1 format.
             print(f"Converting {filename}...")
-            ffmpegio.transcode(f'{filename}', 'output.webm', two_pass=True, show_log=True,**{'c:v':'libx264', 'b:v':'2600k', 'c:a':'aac', 'b:a':'128k'})
+            ffmpegio.transcode(f'{filename}', 'output.mkv', vcodec='libx264', overwrite=True, show_log=True)
+            # ffmpegio.transcode(f'{filename}', './output/output.webm', vcodec='libaom-av1', overwrite=True, show_log=True)
+            # ffmpegio.transcode(f'{filename}', 'output.webm', two_pass=True, show_log=True,**{'c:v':'libx264', 'b:v':'2600k', 'c:a':'aac', 'b:a':'128k'})
             print(f"Converted {filename} to AV1")
 
             # Delete the original MP4 file.

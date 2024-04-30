@@ -1,9 +1,10 @@
 from pytube import YouTube
-import ffmpeg
+import ffmpegio
 import os
+import re
 
 # Define the path where you want to save videos.
-save_path = './output_videos'
+save_path = './'
 
 # Open the file with YouTube URLs.
 with open('links.txt', 'r') as file:
@@ -32,13 +33,13 @@ with open('links.txt', 'r') as file:
             print(f"Downloaded {title}")
 
             # Convert the downloaded video to AV1 format.
-            print(f"Converting {filename} to AV1...")
-            ffmpeg.input(os.path.join(save_path, filename)).output(os.path.join(save_path, f"{title_safe}_{upload_date}.av1"), codec='libaom-av1', crf=30).run(overwrite_output=True)
+            print(f"Converting {filename}...")
+            ffmpegio.transcode(f'{filename}', 'output.webm', two_pass=True, show_log=True,**{'c:v':'libx264', 'b:v':'2600k', 'c:a':'aac', 'b:a':'128k'})
             print(f"Converted {filename} to AV1")
-
 
             # Delete the original MP4 file.
             os.remove(os.path.join(save_path, filename))
+
         except Exception as e:
             print(f"Failed to download {url.strip()}: {e}")
 

@@ -1,49 +1,26 @@
-from pytube import YouTube
-import ffmpegio
-import os
-import re
+from pytube import Playlist, YouTube
 
-# Define the path where you want to save videos.
-save_path = './output'
+# Get the playlist URL from the environment variable
+playlist_url = "https://www.youtube.com/watch?v=2EYHZ2zUqTg&list=PLgtFJ5i1fDDcpItxvY_UQdvC3bEiNCbSQ"
 
-# Open the file with YouTube URLs.
-with open('links.txt', 'r') as file:
-    # Read each line in the file.
-    for url in file:
-        try:
-            # Initialize the YouTube object.
-            yt = YouTube(url.strip())
+if not playlist_url:
+    print("Error: Playlist URL not found in environment variables.")
+    exit(1)
 
-            # Get the title and the upload date.
-            title = yt.title
-            upload_date = yt.publish_date.strftime('%Y-%m-%d')
+# Create a Playlist object
+playlist = Playlist(playlist_url)
 
-            # Filter out characters that are invalid for filenames.
-            title_safe = ''.join(char if char.isalnum() else "_" for char in title)
+# Directory where you want to save the videos
+save_path = "/"
 
-            # Prefix the title with the upload timestamp.
-            filename = f"{title_safe}_{upload_date}.mp4"
+# Iterate over all videos in the playlist
+for video in playlist.video_urls:
+    # Create a YouTube object for the video
+    yt = YouTube(video)
 
-            # Get the highest resolution video stream.
-            video_stream = yt.streams.get_highest_resolution()
+    # Get the highest resolution stream
+    stream = yt.streams.get_highest_resolution()
 
-            # Download the video.
-            print(f"Downloading {title}...")
-            video_stream.download(output_path=save_path, filename=filename)
-            print(f"Downloaded {title}")
-
-            # Convert the downloaded video to AV1 format.
-            print(f"Converting {filename}...")
-            ffmpegio.transcode(f'{filename}', 'output.mkv', vcodec='libx264', overwrite=True, show_log=True)
-            # ffmpegio.transcode(f'{filename}', './output/output.webm', vcodec='libaom-av1', overwrite=True, show_log=True)
-            # ffmpegio.transcode(f'{filename}', 'output.webm', two_pass=True, show_log=True,**{'c:v':'libx264', 'b:v':'2600k', 'c:a':'aac', 'b:a':'128k'})
-            print(f"Converted {filename} to AV1")
-
-            # Delete the original MP4 file.
-            os.remove(os.path.join(save_path, filename))
-
-        except Exception as e:
-            print(f"Failed to download {url.strip()}: {e}")
-
-# Output to let the user know the process is done.
-print("All videos have been downloaded.")
+    print("Downloading:", yt.title)
+    # Download the video to the specified directory
+    stream.download(output_path=save_path)

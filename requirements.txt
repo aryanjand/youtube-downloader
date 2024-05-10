@@ -1,2 +1,0 @@
-pip install pytube --break-system-packages
-pip install ffmpegio --break-system-packages
